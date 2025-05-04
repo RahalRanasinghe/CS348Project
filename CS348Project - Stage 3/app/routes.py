@@ -37,8 +37,10 @@ def login():
 
         # Hardcoded users
         users = {
-            "SynergyAdmin": {"password": "Synergy!321", "role": "admin"},
-            "SynergyUser": {"password": "Synergy2025!", "role": "user"}
+            # Please note that these credentials are different to the committed code on Azure. The password has been changed in this version for security purposes. 
+            # Please refer to the uploaded readme.txt file in the Brightspace submission
+            "SynergyAdmin": {"password": "AdminPlaceHolderPW", "role": "admin"},
+            "SynergyUser": {"password": "UserPlaceHolderPW", "role": "user"}
         }
 
         user = users.get(username)
