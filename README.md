@@ -1,0 +1,1 @@
+routes.py is where the credentials of the accounts are hardcoded. Please note that these credentials in this GitHub repository are different to the committed code on Azure. The credentials have been changed in this version for security purposes. Please refer to the readme.txt file in my Brightspace submission.
