@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Report Results</h2>
+
+<p><strong>Report Type:</strong> {{ report_type.capitalize() }}</p>
+<p><strong>Date Range:</strong> {{ start_date | datetimeformat }} to {{ end_date | datetimeformat }}</p>
+
+<!-- Table -->
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        {% if report_type == 'exams' %}
+        <tr>
+            <th>Exam Date</th>
+            <th>Exam Name</th>
+            <th>Provider</th>
+            <th>Hours</th>
+            <th>Customer Name</th>
+            <th style="min-width: 100px;">IC Number</th>
+            <th>Organisation</th>
+            <th>Work Email</th>
+        </tr>
+        {% else %}
+        <tr>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Training Name</th>
+            <th>Provider</th>
+            <th>Hours</th>
+            <th>Customer Name</th>
+            <th style="min-width: 100px;">IC Number</th>
+            <th>Organisation</th>
+            <th>Work Email</th>
+        </tr>
+        {% endif %}
+    </thead>
+    <tbody>
+        {% for row in results %}
+        <tr>
+            {% if report_type == 'exams' %}
+                <td>{{ row.ExamDate.strftime('%d/%m/%Y') }}</td>
+                <td>{{ row.ExamName }}</td>
+                <td>{{ row.ExamProvider }}</td>
+                <td>{{ row.NumHours }}</td>
+                <td>{{ row.FirstName }} {{ row.LastName }}</td>
+                <td style="min-width: 100px;">{{ row.ICNum }}</td>
+                <td>{{ row.Organisation }}</td>
+                <td>{{ row.WorkEmail }}</td>
+            {% else %}
+                <td>{{ row.TrainingStartDate.strftime('%d/%m/%Y') }}</td>
+                <td>{{ row.TrainingEndDate.strftime('%d/%m/%Y') }}</td>
+                <td>{{ row.TrainingName }}</td>
+                <td>{{ row.TrainingProvider }}</td>
+                <td>{{ row.NumHours }}</td>
+                <td>{{ row.FirstName }} {{ row.LastName }}</td>
+                <td style="min-width: 100px;">{{ row.ICNum }}</td>
+                <td>{{ row.Organisation }}</td>
+                <td>{{ row.WorkEmail }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Buttons at the bottom of the page -->
+<div class="mt-4">
+    <a href="{{ url_for('main.reports') }}" class="btn btn-secondary">Back</a>
+
+    <form action="{{ url_for('main.export_csv') }}" method="post" style="display:inline;">
+        <input type="hidden" name="report_type" value="{{ report_type }}">
+        <input type="hidden" name="start_date" value="{{ start_date.strftime('%Y-%m-%d') }}">
+        <input type="hidden" name="end_date" value="{{ end_date.strftime('%Y-%m-%d') }}">
+        <button type="submit" class="btn btn-outline-success">Export as CSV</button>
+    </form>
+</div>
+{% endblock %}

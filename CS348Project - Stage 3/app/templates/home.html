@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h2 class="mb-4"></h2>
+
+    <div class="d-grid gap-3 col-6 mx-auto">
+        <a href="{{ url_for('main.list_customers') }}" class="btn btn-primary btn-lg">Manage Customers</a>
+        <a href="{{ url_for('main.list_trainings') }}" class="btn btn-primary btn-lg">Manage Trainings</a>
+        <a href="{{ url_for('main.list_exams') }}" class="btn btn-primary btn-lg">Manage Exams</a>
+        <a href="{{ url_for('main.reports') }}" class="btn btn-primary btn-lg">Generate Reports</a>
+    </div>
+</div>
+{% endblock %}

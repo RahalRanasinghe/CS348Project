@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ action }} Training</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="ICNum">Customer IC Number:</label>
+        <input type="text" name="ICNum" id="ic-input" class="form-control" value="{{ customer.ICNum if customer else '' }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="FirstName">Customer First Name:</label>
+        <input type="text" class="form-control" id="first-name" readonly value="{{ customer.FirstName if customer else '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="LastName">Customer Last Name:</label>
+        <input type="text" class="form-control" id="last-name" readonly value="{{ customer.LastName if customer else '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="TrainingDetailID">Training Name:</label>
+        <select name="TrainingDetailID" id="TrainingDetailID" class="form-select" required onchange="updateProvider()">
+            <option value="">-- Select Training --</option>
+            {% for t in training_details %}
+                <option value="{{ t.TrainingDetailID }}"
+                    {% if training and training.TrainingDetailID == t.TrainingDetailID %}selected{% endif %}>
+                    {{ t.TrainingName }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="TrainingProvider">Provider:</label>
+        <input type="text" class="form-control" id="TrainingProvider" readonly
+               value="{% for t in training_details %}{% if training and training.TrainingDetailID == t.TrainingDetailID %}{{ t.TrainingProvider }}{% endif %}{% endfor %}">
+    </div>
+
+    <div class="mb-3">
+        <label for="TrainingStartDate">Start Date:</label>
+        <input type="date" name="TrainingStartDate" class="form-control"
+               value="{{ training.TrainingStartDate.strftime('%Y-%m-%d') if training else '' }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="TrainingEndDate">End Date:</label>
+        <input type="date" name="TrainingEndDate" class="form-control"
+               value="{{ training.TrainingEndDate.strftime('%Y-%m-%d') if training else '' }}" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">{{ action }} Training</button>
+    <a href="{{ url_for('main.list_trainings') }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+// Update training provider on training selection
+const trainingDetails = {
+    {% for t in training_details %}
+    "{{ t.TrainingDetailID }}": "{{ t.TrainingProvider }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+};
+
+function updateProvider() {
+    const selectedId = document.getElementById("TrainingDetailID").value;
+    const providerInput = document.getElementById("TrainingProvider");
+    providerInput.value = trainingDetails[selectedId] || "";
+}
+
+// Autofill customer name based on IC number
+document.addEventListener("DOMContentLoaded", function () {
+    const icInput = document.getElementById("ic-input");
+    const firstNameField = document.getElementById("first-name");
+    const lastNameField = document.getElementById("last-name");
+
+    icInput.addEventListener("blur", function () {
+        const ic = icInput.value.trim();
+
+        fetch(`/get-customer-name?ic=${encodeURIComponent(ic)}`)
+            .then(response => {
+                if (!response.ok) {
+                    firstNameField.value = "";
+                    lastNameField.value = "";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    firstNameField.value = data.first_name || "";
+                    lastNameField.value = data.last_name || "";
+                }
+            })
+            .catch(err => {
+                firstNameField.value = "";
+                lastNameField.value = "";
+            });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ action }} Exam</h2>
+
+<form method="POST">
+    <!-- IC Number input -->
+    <div class="mb-3">
+        <label for="ICNum">Customer IC Number:</label>
+        <input type="text" name="ICNum" id="ic-input" class="form-control"
+               value="{{ customer.ICNum if customer else '' }}" required>
+    </div>
+
+    <!-- Auto-filled Customer Name -->
+    <div class="mb-3">
+        <label for="FirstName">Customer First Name:</label>
+        <input type="text" class="form-control" id="first-name" readonly
+               value="{{ customer.FirstName if customer else '' }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="LastName">Customer Last Name:</label>
+        <input type="text" class="form-control" id="last-name" readonly
+               value="{{ customer.LastName if customer else '' }}">
+    </div>
+
+    <!-- Exam dropdown -->
+    <div class="mb-3">
+        <label for="ExamDetailID">Exam Name:</label>
+        <select name="ExamDetailID" id="ExamDetailID" class="form-select" required onchange="updateExamProvider()">
+            <option value="">-- Select Exam --</option>
+            {% for e in exam_details %}
+                <option value="{{ e.ExamDetailID }}"
+                    {% if exam and exam.ExamDetailID == e.ExamDetailID %}selected{% endif %}>
+                    {{ e.ExamName }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Auto-filled provider -->
+    <div class="mb-3">
+        <label for="ExamProvider">Provider:</label>
+        <input type="text" class="form-control" id="ExamProvider" readonly
+               value="{% if exam %}{{ exam.detail.ExamProvider }}{% endif %}">
+    </div>
+
+    <!-- Exam Date -->
+    <div class="mb-3">
+        <label for="ExamDate">Exam Date:</label>
+        <input type="date" name="ExamDate" class="form-control" required
+               value="{% if exam %}{{ exam.ExamDate.strftime('%Y-%m-%d') }}{% endif %}">
+    </div>
+
+    <!-- Buttons -->
+    <button type="submit" class="btn btn-success">{{ action }} Exam</button>
+    <a href="{{ url_for('main.list_exams') }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<!-- JavaScript for dynamic fields -->
+<script>
+// Fill provider based on selected exam
+const examDetails = {
+    {% for e in exam_details %}
+    "{{ e.ExamDetailID }}": "{{ e.ExamProvider }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+};
+
+function updateExamProvider() {
+    const selectedId = document.getElementById("ExamDetailID").value;
+    document.getElementById("ExamProvider").value = examDetails[selectedId] || "";
+}
+
+// Autofill name from IC number
+document.addEventListener("DOMContentLoaded", function () {
+    const icInput = document.getElementById("ic-input");
+    const firstNameField = document.getElementById("first-name");
+    const lastNameField = document.getElementById("last-name");
+
+    icInput.addEventListener("blur", function () {
+        const ic = icInput.value.trim();
+
+        fetch(`/get-customer-name?ic=${encodeURIComponent(ic)}`)
+            .then(response => {
+                if (!response.ok) {
+                    firstNameField.value = "";
+                    lastNameField.value = "";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    firstNameField.value = data.first_name || "";
+                    lastNameField.value = data.last_name || "";
+                }
+            })
+            .catch(() => {
+                firstNameField.value = "";
+                lastNameField.value = "";
+            });
+    });
+
+    updateExamProvider();  // Set provider on load if editing
+});
+</script>
+{% endblock %}

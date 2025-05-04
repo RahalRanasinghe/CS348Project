@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Customer List</h2>
+
+{% if session['role'] == 'admin' %}
+<a href="{{ url_for('main.add_customer') }}">Add New Customer</a>
+{% endif %}
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Gender</th>
+            <th>DOB</th>
+            <th>Phone</th>
+            <th style="min-width: 120px;">IC</th>
+            <th>Organisation</th>
+            <th>Personal Email</th>
+            <th>Work Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in customers %}
+        <tr>
+            <td>{{ c.CustomerID }}</td>
+            <td>{{ c.FirstName }} {{ c.LastName }}</td>
+            <td>{{ c.Gender }}</td>
+            <td>{{ c.DOB.strftime('%d/%m/%Y') }}</td>
+            <td>{{ c.PhoneNum }}</td>
+            <td>{{ c.ICNum }}</td>
+            <td>{{ c.Organisation }}</td>
+            <td>{{ c.PersonalEmail }}</td>
+            <td>{{ c.WorkEmail }}</td>
+            <td>
+                {% if session['role'] == 'admin' %}
+                    <a href="{{ url_for('main.edit_customer', id=c.CustomerID) }}">Edit</a> |
+                    <form action="{{ url_for('main.delete_customer', id=c.CustomerID) }}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Delete this customer?')">Delete</button>
+                    </form>
+                {% else %}
+                    <span class="text-muted">View Only</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

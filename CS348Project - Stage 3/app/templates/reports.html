@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Generate Report</h2>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form action="{{ url_for('main.report_results') }}" method="POST" class="mb-4">
+    <div class="mb-3">
+        <label>Start Date:</label>
+        <input type="date" name="start_date" required class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>End Date:</label>
+        <input type="date" name="end_date" required class="form-control">
+    </div>
+    <div class="mb-3">
+        <label>Report Type:</label><br>
+        <input type="radio" id="exams" name="report_type" value="exams" required>
+        <label for="exams">Exams</label>
+        <input type="radio" id="trainings" name="report_type" value="trainings">
+        <label for="trainings">Trainings</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Generate Report</button>
+</form>
+
+{% endblock %}

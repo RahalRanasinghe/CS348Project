@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Training List</h2>
+
+{% if session['role'] == 'admin' %}
+<a href="{{ url_for('main.add_training') }}">Add New Training</a>
+{% endif %}
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th style="min-width: 120px;">IC</th>
+            <th>Training Detail ID</th>
+            <th>Training Name</th>
+            <th>Provider</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in trainings %}
+        <tr>
+            <td>{{ t.TrainingID }}</td>
+            <td>{{ t.CustomerID }}</td>
+            <td>{{ t.FirstName }} {{ t.LastName }}</td>
+            <td>{{ t.ICNum }}</td>
+            <td>{{ t.TrainingDetailID }}</td>
+            <td>{{ t.TrainingName }}</td>
+            <td>{{ t.TrainingProvider }}</td>
+            <td>{{ t.TrainingStartDate.strftime('%d/%m/%Y') }}</td>
+            <td>{{ t.TrainingEndDate.strftime('%d/%m/%Y') }}</td>
+            <td>
+                {% if session['role'] == 'admin' %}
+                    <a href="{{ url_for('main.edit_training', id=t.TrainingID) }}">Edit</a> |
+                    <form action="{{ url_for('main.delete_training', id=t.TrainingID) }}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Delete this training?')">Delete</button>
+                    </form>
+                {% else %}
+                    <span class="text-muted">View Only</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

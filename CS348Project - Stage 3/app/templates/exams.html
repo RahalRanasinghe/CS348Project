@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Exam List</h2>
+
+{% if session['role'] == 'admin' %}
+<a href="{{ url_for('main.add_exam') }}">Add New Exam</a>
+{% endif %}
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Exam ID</th>
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th style="min-width: 120px;">IC</th>
+            <th>Exam Detail ID</th>
+            <th>Exam Name</th>
+            <th>Provider</th>
+            <th>Exam Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in exams %}
+        <tr>
+            <td>{{ e.ExamID }}</td>
+            <td>{{ e.CustomerID }}</td>
+            <td>{{ e.FirstName }} {{ e.LastName }}</td>
+            <td>{{ e.ICNum }}</td>
+            <td>{{ e.ExamDetailID }}</td>
+            <td>{{ e.ExamName }}</td>
+            <td>{{ e.ExamProvider }}</td>
+            <td>{{ e.ExamDate.strftime('%d/%m/%Y') }}</td>
+            <td>
+                {% if session['role'] == 'admin' %}
+                    <a href="{{ url_for('main.edit_exam', id=e.ExamID) }}">Edit</a> |
+                    <form action="{{ url_for('main.delete_exam', id=e.ExamID) }}" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Delete this exam?')">Delete</button>
+                    </form>
+                {% else %}
+                    <span class="text-muted">View Only</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
